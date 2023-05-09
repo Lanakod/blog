@@ -1,11 +1,17 @@
 import React, { FC } from "react";
 import { CustomNextPage } from "@types";
+import Head from "next/head";
 
 const Categories: CustomNextPage = () => {
   return (
-    <main>
-      <p>Protected Page</p>
-    </main>
+    <>
+      <Head>
+        <title>Categories</title>
+      </Head>
+      <main>
+        <p>Protected Page</p>
+      </main>
+    </>
   );
 };
 

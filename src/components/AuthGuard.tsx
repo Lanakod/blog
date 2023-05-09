@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Center, Loader } from "@mantine/core";
+import Head from "next/head";
 
 type Props = {
   children: React.ReactElement;
@@ -11,9 +12,14 @@ export const AuthGuard: React.FC<Props> = ({ children }) => {
   const router = useRouter();
   const loader = useMemo(
     () => (
-      <Center sx={{ width: "100vw", height: "100vh" }}>
-        <Loader size="lg" />
-      </Center>
+      <>
+        <Head>
+          <title>Loading...</title>
+        </Head>
+        <Center sx={{ width: "100vw", height: "100vh" }}>
+          <Loader size="lg" />
+        </Center>
+      </>
     ),
     []
   );
