@@ -1,4 +1,3 @@
-import React, { Dispatch, FC, SetStateAction } from "react";
 import {
   ActionIcon,
   Avatar,
@@ -13,17 +12,18 @@ import {
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
-import { GoArchive } from "react-icons/go";
-import { ImIcoMoon, ImSun } from "react-icons/im";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import React, { Dispatch, FC, SetStateAction } from "react";
 import { AiOutlineHome } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
 import { BsBox } from "react-icons/bs";
 import { FiSettings } from "react-icons/fi";
-import { TbClipboardList } from "react-icons/tb";
+import { GoArchive } from "react-icons/go";
+import { ImIcoMoon, ImSun } from "react-icons/im";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { TbClipboardList } from "react-icons/tb";
 
 type Props = {
   setOpened: Dispatch<SetStateAction<boolean>>;
@@ -89,35 +89,45 @@ const data: MainLinkProps[] = [
     label: "Home",
     color: "blue",
     icon: <AiOutlineHome size={18} />,
-    setOpened: () => {},
+    setOpened: () => {
+      return null;
+    },
   },
   {
     pageLink: "/categories",
     label: "Categories",
     color: "teal",
     icon: <BiCategory size={18} />,
-    setOpened: () => {},
+    setOpened: () => {
+      return null;
+    },
   },
   {
     pageLink: "/inventory",
     label: "Inventory",
     color: "violet",
     icon: <BsBox size={16} />,
-    setOpened: () => {},
+    setOpened: () => {
+      return null;
+    },
   },
   {
     pageLink: "/products",
     label: "Products",
     color: "grape",
     icon: <TbClipboardList size={20} />,
-    setOpened: () => {},
+    setOpened: () => {
+      return null;
+    },
   },
   {
     pageLink: "/settings",
     label: "Settings",
     color: "orange",
     icon: <FiSettings size={16} />,
-    setOpened: () => {},
+    setOpened: () => {
+      return null;
+    },
   },
 ];
 

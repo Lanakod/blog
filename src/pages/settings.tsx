@@ -1,6 +1,7 @@
-import React, { FC } from "react";
-import { CustomNextPage } from "@types";
 import Head from "next/head";
+import React from "react";
+
+import { CustomNextPage } from "@types";
 
 const Settings: CustomNextPage = () => {
   return (

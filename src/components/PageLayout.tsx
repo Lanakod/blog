@@ -1,4 +1,3 @@
-import React, { FC, useState } from "react";
 import {
   AppShell,
   Burger,
@@ -7,6 +6,8 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
+import React, { FC, useState } from "react";
+
 import { NavBar } from "@/components";
 
 type Props = {

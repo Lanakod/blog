@@ -1,17 +1,19 @@
 import "@/styles/globals.scss";
-import type { AppProps } from "next/app";
-import { SessionProvider } from "next-auth/react";
-import type { NextComponentType } from "next";
-import { AuthGuard, PageLayout } from "@/components";
 import {
   ColorScheme,
   ColorSchemeProvider,
   Global,
   MantineProvider,
 } from "@mantine/core";
-import { useState } from "react";
 import { useColorScheme } from "@mantine/hooks";
 import { getCookie, setCookie } from "cookies-next";
+import type { NextComponentType } from "next";
+import type { AppProps } from "next/app";
+import { SessionProvider } from "next-auth/react";
+import { useState } from "react";
+
+import { AuthGuard, PageLayout } from "@/components";
+
 import { cache } from "../../cache";
 
 export type CustomAppProps = AppProps & {

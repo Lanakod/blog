@@ -1,4 +1,11 @@
-import { Head, Html, Main, NextScript } from "next/document";
+import { ServerStyles, createStylesServer } from "@mantine/next";
+import Document, {
+  DocumentContext,
+  Head,
+  Html,
+  Main,
+  NextScript,
+} from "next/document";
 //
 // const getInitialProps = createGetInitialProps();
 //
@@ -29,8 +36,6 @@ import { Head, Html, Main, NextScript } from "next/document";
 //   }
 // }
 
-import Document, { DocumentContext } from "next/document";
-import { ServerStyles, createStylesServer } from "@mantine/next";
 import { cache } from "../../cache";
 
 const stylesServer = createStylesServer(cache);

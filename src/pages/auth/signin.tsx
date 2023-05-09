@@ -1,7 +1,13 @@
-import { getProviders, signIn } from "next-auth/react";
 import { Button, Center, Group, Stack, Text, Title } from "@mantine/core";
-import { FaGoogle, FaGithub, FaDiscord, FaGitlab } from "react-icons/fa";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { getProviders, signIn } from "next-auth/react";
+import { FaDiscord, FaGithub, FaGitlab, FaGoogle } from "react-icons/fa";
+
+type Props = {
+  // TODO: Remove ANY and make typescript happy
+  providers: any;
+};
 
 const getIcon = (id: string) => {
   if (id === "google") return <FaGoogle />;
@@ -11,7 +17,7 @@ const getIcon = (id: string) => {
   else return null;
 };
 
-export default function SignIn({ providers }: any) {
+export default function SignIn({ providers }: Props) {
   return (
     <>
       <Head>
@@ -26,6 +32,7 @@ export default function SignIn({ providers }: any) {
         <Stack spacing="xl">
           <Title align="center">Welcome to my Blog</Title>
 
+          {/*  TODO: Remove ANY and make typescript happy*/}
           {Object.values(providers).map((provider: any) => {
             return (
               <Button
@@ -48,9 +55,9 @@ export default function SignIn({ providers }: any) {
 }
 
 // This is the recommended way for Next.js 9.3 or newer
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const providers = await getProviders();
   return {
     props: { providers },
   };
-}
+};

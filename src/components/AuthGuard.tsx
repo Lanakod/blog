@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { Center, Loader } from "@mantine/core";
 import Head from "next/head";
+import router from "next/router";
+import { useSession } from "next-auth/react";
+import React, { useEffect, useMemo } from "react";
 
 type Props = {
   children: React.ReactElement;
 };
 export const AuthGuard: React.FC<Props> = ({ children }) => {
   const { data, status } = useSession();
-  const router = useRouter();
+  // const router = useRouter();
   const loader = useMemo(
     () => (
       <>
@@ -24,8 +24,8 @@ export const AuthGuard: React.FC<Props> = ({ children }) => {
     []
   );
   useEffect(() => {
-    if (status === "unauthenticated" && router.pathname !== "/auth/signin")
-      router.push("/auth/signin");
+    if (router.pathname === "/auth/signin") return;
+    if (status === "unauthenticated") router.push("/auth/signin");
   }, [status, data]);
 
   if (status === "authenticated") return children;
