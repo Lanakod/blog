@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
 
-import { CustomNextPage } from "@types";
+import { CustomNextPage } from "@/types";
 
 const Settings: CustomNextPage = () => {
   return (

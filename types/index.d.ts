@@ -1,2 +1,3 @@
 export * from "./custom-next-page";
-export * from "./auth-types";
+export * from "./getCategories";
+export * from "./postCategories";
