@@ -1,8 +1,11 @@
 import { Button, Center, Group, Stack, Text, Title } from "@mantine/core";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { getServerSession } from "next-auth";
 import { getProviders, signIn } from "next-auth/react";
 import { FaDiscord, FaGithub, FaGitlab, FaGoogle } from "react-icons/fa";
+
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 type Props = {
   // TODO: Remove ANY and make typescript happy
@@ -55,8 +58,19 @@ export default function SignIn({ providers }: Props) {
 }
 
 // This is the recommended way for Next.js 9.3 or newer
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const providers = await getProviders();
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
+  if (session)
+    return {
+      props: {
+        providers,
+      },
+      redirect: {
+        destination: "/",
+      },
+    };
+
   return {
     props: { providers },
   };

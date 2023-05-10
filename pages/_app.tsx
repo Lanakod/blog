@@ -12,11 +12,10 @@ import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 import { cache } from "@/cache";
 import { AuthGuard, PageLayout } from "@/components";
-
-import { ReactQueryDevtools } from "react-query/devtools";
 
 export type CustomAppProps = AppProps & {
   Component: NextComponentType & {

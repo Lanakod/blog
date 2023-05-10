@@ -3,21 +3,26 @@ import {
   Box,
   Button,
   Group,
+  LoadingOverlay,
+  Modal,
   Select,
   Skeleton,
   Table,
   Text,
+  TextInput,
   ThemeIcon,
   Title,
 } from "@mantine/core";
+import { useForm, zodResolver } from "@mantine/form";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
-
 import { BiCategory } from "react-icons/bi";
 import { FiSearch } from "react-icons/fi";
-import { MdWarningAmber } from "react-icons/md";
-import { CustomNextPage, GetCategory } from "@/types";
-import { useGetCategories } from "@/queries";
+
+import { queryClient } from "@/pages/_app";
+import { useGetCategories, usePostCategory } from "@/queries";
+import { GetCategory, PostCategorySchema } from "@/types";
+import { CustomNextPage } from "@/types/dts";
 
 const Categories: CustomNextPage = () => {
   const { data: categories, isLoading: categoriesLoading } = useGetCategories();
@@ -30,6 +35,7 @@ const Categories: CustomNextPage = () => {
   // FILTERED VALUES
   const [filteredValues, setFilteredValues] = useState<GetCategory[]>();
   // MODAL STATE
+  const [createModal, setCreateModal] = useState(false);
 
   // SET SELECT DATA FOR SEARCH
   useEffect(() => {
@@ -50,6 +56,17 @@ const Categories: CustomNextPage = () => {
       setFilteredValues(categories);
     }
   }, [selectValue, categories]);
+
+  // VALIDATE POST CATEGORY FORM
+  const createCategoryForm = useForm({
+    validate: zodResolver(PostCategorySchema),
+    initialValues: {
+      name: "",
+    },
+  });
+
+  const { mutate: postCategory, isLoading: postCategoryLoading } =
+    usePostCategory();
 
   return (
     <>
@@ -181,13 +198,52 @@ const Categories: CustomNextPage = () => {
         </Skeleton>
         {/*  ACTIONS FOR CATEGORIES  */}
         <Box>
-          <Button color="blue" variant="outline">
+          <Button
+            color="blue"
+            variant="outline"
+            onClick={() => setCreateModal(true)}
+          >
             Create Category
           </Button>
         </Box>
 
         {/*  MODALS  */}
         {/*  CREATE CATEGORY  */}
+        <Modal
+          centered
+          opened={createModal}
+          onClose={() => setCreateModal(false)}
+          title="Create Category"
+        >
+          <form
+            onSubmit={createCategoryForm.onSubmit((values) => {
+              postCategory(values, {
+                onSuccess: async () => {
+                  setCreateModal(false);
+                  await queryClient.refetchQueries(["categories"]);
+                },
+              });
+            })}
+          >
+            <LoadingOverlay
+              visible={postCategoryLoading ?? false}
+              transitionDuration={500}
+            />
+            <TextInput
+              placeholder="Category name"
+              label="Category name"
+              withAsterisk
+              mb="1rem"
+              {...createCategoryForm.getInputProps("name")}
+            />
+            <Group noWrap={false}>
+              <Button type="submit">Create</Button>
+              <Button color="red" onClick={() => setCreateModal(false)}>
+                Exit
+              </Button>
+            </Group>
+          </form>
+        </Modal>
       </main>
     </>
   );

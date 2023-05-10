@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { prisma } from "@/config/prisma";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { PostCategorySchema } from "@/types/postCategories";
+import { PostCategorySchema } from "@/types";
 
 const postCategory = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions);
