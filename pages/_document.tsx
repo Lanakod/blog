@@ -36,7 +36,7 @@ import Document, {
 //   }
 // }
 
-import { cache } from "../../cache";
+import { cache } from "@/cache";
 
 const stylesServer = createStylesServer(cache);
 
@@ -56,6 +56,7 @@ export default class _Document extends Document {
       ],
     };
   }
+
   render() {
     return (
       <Html lang="en">

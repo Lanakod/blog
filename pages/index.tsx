@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
-import { CustomNextPage } from "@types";
+import { CustomNextPage } from "@/types";
 
 const Home: CustomNextPage = () => {
   const { data, status } = useSession();
