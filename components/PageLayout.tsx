@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import React, { FC, useState } from "react";
 
-import { NavBar } from "@/components";
+import { NavBar } from "@/components/NavBar";
 
 type Props = {
   children: React.ReactElement;

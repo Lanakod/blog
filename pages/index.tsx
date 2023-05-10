@@ -1,11 +1,13 @@
+import { Button } from "@mantine/core";
 import Head from "next/head";
-import Link from "next/link";
+import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
 
 import { CustomNextPage } from "@/types/dts";
 
 const Home: CustomNextPage = () => {
   const { data, status } = useSession();
+  const router = useRouter();
   return (
     <>
       <Head>
@@ -18,16 +20,15 @@ const Home: CustomNextPage = () => {
         {data?.user ? (
           <p>Hello, {data?.user?.name}!</p>
         ) : (
-          <Link href="/auth/signin">Sign In</Link>
+          <Button onClick={async () => await router.push("/auth/signin")}>
+            Sign In
+          </Button>
         )}
         {status === "authenticated" && (
-          <button onClick={() => signOut()}>Sign Out</button>
+          <Button onClick={() => signOut()}>Sign Out</Button>
         )}
-        <Link href="/categories">Protected page</Link>
       </main>
     </>
   );
 };
 export default Home;
-
-Home.requireAuth = true;

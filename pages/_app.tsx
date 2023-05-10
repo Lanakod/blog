@@ -6,56 +6,57 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import { useColorScheme } from "@mantine/hooks";
-import { getCookie, setCookie } from "cookies-next";
-import type { NextComponentType } from "next";
-import type { AppProps } from "next/app";
+import { NextComponentType } from "next";
+import NextApp, { AppContext, AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
+import nookies from "nookies";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
-import { cache } from "@/cache";
-import { AuthGuard, PageLayout } from "@/components";
+// import { cache } from "@/cache";
+import { AuthGuard, PageLayout, RouterTransition } from "@/components";
 
 export type CustomAppProps = AppProps & {
   Component: NextComponentType & {
     requireAuth?: boolean;
   };
+  colorScheme?: ColorScheme;
 };
 export const queryClient = new QueryClient();
 
 export default function App({
   Component,
+  colorScheme,
   pageProps: { session, ...pageProps },
 }: CustomAppProps) {
   const preferredColorScheme = useColorScheme();
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(() => {
-    const cookieTheme = getCookie("mantine-color-scheme");
-    if (cookieTheme) return cookieTheme as ColorScheme;
-    return preferredColorScheme;
-  });
+  const [_colorScheme, setColorScheme] = useState<ColorScheme>(
+    colorScheme || preferredColorScheme
+  );
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =
-      value || (colorScheme === "dark" ? "light" : "dark");
+      value || (_colorScheme === "dark" ? "light" : "dark");
     setColorScheme(nextColorScheme);
-    setCookie("mantine-color-scheme", nextColorScheme, {
+    nookies.set(null, "color-scheme", nextColorScheme, {
       maxAge: 60 * 60 * 24 * 30,
       sameSite: "strict",
     });
   };
+
   return (
     <QueryClientProvider client={queryClient}>
       <ColorSchemeProvider
-        colorScheme={colorScheme}
+        colorScheme={_colorScheme}
         toggleColorScheme={toggleColorScheme}
       >
         <MantineProvider
-          emotionCache={cache}
           withGlobalStyles
           withNormalizeCSS
           theme={{
-            colorScheme: colorScheme,
+            colorScheme: _colorScheme,
             fontFamily: "Montserrat, sans-serif",
+            transitionTimingFunction: "ease-in-out",
           }}
         >
           <SessionProvider
@@ -63,6 +64,7 @@ export default function App({
             refetchInterval={5 * 60}
             refetchOnWindowFocus
           >
+            <RouterTransition />
             <Global
               styles={(theme) => ({
                 a: {
@@ -80,15 +82,16 @@ export default function App({
                 },
               })}
             />
-            {Component.requireAuth ? (
-              <AuthGuard>
-                <PageLayout>
+            <PageLayout>
+              {Component.requireAuth ? (
+                <AuthGuard>
                   <Component {...pageProps} />
-                </PageLayout>
-              </AuthGuard>
-            ) : (
-              <Component {...pageProps} />
-            )}
+                </AuthGuard>
+              ) : (
+                <Component {...pageProps} />
+              )}
+            </PageLayout>
+
             <ReactQueryDevtools position="bottom-right" />
           </SessionProvider>
         </MantineProvider>
@@ -96,3 +99,15 @@ export default function App({
     </QueryClientProvider>
   );
 }
+
+App.getInitialProps = async (appContext: AppContext) => {
+  const appProps = await NextApp.getInitialProps(appContext);
+  let colorScheme: ColorScheme | null = null;
+  const cookies = nookies.get(appContext.ctx);
+  if (cookies["color-scheme"])
+    colorScheme = cookies["color-scheme"] as ColorScheme;
+  return {
+    ...appProps,
+    colorScheme: colorScheme || "light",
+  };
+};

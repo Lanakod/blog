@@ -9,14 +9,14 @@ type Props = {
 };
 export const AuthGuard: React.FC<Props> = ({ children }) => {
   const { data, status } = useSession();
-  // const router = useRouter();
+
   const loader = useMemo(
     () => (
       <>
         <Head>
           <title>Loading...</title>
         </Head>
-        <Center sx={{ width: "100vw", height: "100vh" }}>
+        <Center sx={{ width: "100%", height: "100%" }}>
           <Loader size="lg" />
         </Center>
       </>

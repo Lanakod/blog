@@ -1,10 +1,10 @@
 import {
-  ActionIcon,
   Avatar,
   Box,
   Group,
   MantineNumberSize,
   Navbar,
+  Switch,
   Text,
   ThemeIcon,
   Title,
@@ -15,13 +15,12 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import React, { Dispatch, FC, SetStateAction } from "react";
+import React, { Dispatch, FC, SetStateAction, useMemo } from "react";
 import { AiOutlineHome } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
-import { BsBox } from "react-icons/bs";
+import { BsBox, BsMoonStars, BsSun } from "react-icons/bs";
 import { FiSettings } from "react-icons/fi";
 import { GoArchive } from "react-icons/go";
-import { ImIcoMoon, ImSun } from "react-icons/im";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { TbClipboardList } from "react-icons/tb";
 
@@ -86,7 +85,7 @@ const MainLink: FC<MainLinkProps> = ({
 const data: MainLinkProps[] = [
   {
     pageLink: "/",
-    label: "Home",
+    label: "Главная",
     color: "blue",
     icon: <AiOutlineHome size={18} />,
     setOpened: () => {
@@ -95,7 +94,7 @@ const data: MainLinkProps[] = [
   },
   {
     pageLink: "/categories",
-    label: "Categories",
+    label: "Посты",
     color: "teal",
     icon: <BiCategory size={18} />,
     setOpened: () => {
@@ -122,7 +121,7 @@ const data: MainLinkProps[] = [
   },
   {
     pageLink: "/settings",
-    label: "Settings",
+    label: "Настройки",
     color: "orange",
     icon: <FiSettings size={16} />,
     setOpened: () => {
@@ -170,17 +169,24 @@ const Brand: FC = () => {
             Inventory
           </Title>
         </Group>
-        <ActionIcon
-          variant="default"
-          size={30}
-          onClick={() => toggleColorScheme()}
-        >
-          {colorScheme === "dark" ? (
-            <ImSun size={18} />
-          ) : (
-            <ImIcoMoon size={18} />
-          )}
-        </ActionIcon>
+        <Switch
+          checked={colorScheme === "dark"}
+          onChange={() => toggleColorScheme()}
+          size="md"
+          onLabel={<BsSun size={18} />}
+          offLabel={<BsMoonStars size={18} />}
+        />
+        {/*<ActionIcon*/}
+        {/*  variant="default"*/}
+        {/*  size={30}*/}
+        {/*  onClick={() => toggleColorScheme()}*/}
+        {/*>*/}
+        {/*  {colorScheme === "dark" ? (*/}
+        {/*    <BsSun size={18} />*/}
+        {/*  ) : (*/}
+        {/*    <BsMoonStars size={18} />*/}
+        {/*  )}*/}
+        {/*</ActionIcon>*/}
       </Group>
     </Box>
   );
@@ -199,8 +205,13 @@ const User: FC = () => {
   const { data: session } = useSession();
   const { pathname } = useRouter();
 
+  const href = useMemo(() => {
+    if (!session) return "/auth/signin";
+    return pathname === "/settings" ? "/" : "/settings";
+  }, [pathname, session]);
+
   return (
-    <Link href={pathname === "/settings" ? "/" : "/settings"} passHref>
+    <Link href={href} passHref>
       <Box
         sx={{
           paddingTop: theme.spacing.sm,
@@ -237,20 +248,26 @@ const User: FC = () => {
             >
               {`${getWordInitials(session?.user?.name ?? "")}`}
             </Avatar>
-            {/* Info */}
-            <Box sx={{ flex: 1 }}>
-              <Text size="sm" weight={500}>
-                {session?.user?.name}
-              </Text>
-              <Text color="dimmed" size="xs">
-                {session?.user?.email}
-              </Text>
-            </Box>
-            {/* Icon */}
-            {pathname === "/settings" ? (
-              <MdKeyboardArrowLeft size={18} />
+            {!session ? (
+              <Text weight={500}>Войти</Text>
             ) : (
-              <MdKeyboardArrowRight size={18} />
+              <>
+                {/*  Info  */}
+                <Box sx={{ flex: 1 }}>
+                  <Text size="sm" weight={500}>
+                    {session?.user?.name}
+                  </Text>
+                  <Text color="dimmed" size="xs">
+                    {session?.user?.email}
+                  </Text>
+                </Box>
+                {/*  Icon  */}
+                {pathname === "/settings" ? (
+                  <MdKeyboardArrowLeft size={18} />
+                ) : (
+                  <MdKeyboardArrowRight size={18} />
+                )}
+              </>
             )}
           </Group>
         </UnstyledButton>
