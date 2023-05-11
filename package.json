@@ -33,7 +33,11 @@
     "react-query": "^3.39.3",
     "sass": "^1.62.1",
     "typescript": "^5.0.4",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "@react-buddy/ide-toolbox-next": "^2.4.0",
+    "@react-buddy/palette-mantine-core": "^6.0.0",
+    "@react-buddy/palette-mantine-form": "^6.0.0",
+    "@react-buddy/palette-mantine-dates": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.16.3",

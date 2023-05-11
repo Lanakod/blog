@@ -6,20 +6,23 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import { useColorScheme } from "@mantine/hooks";
+import { Role } from "@prisma/client";
+import { DevSupport } from "@react-buddy/ide-toolbox-next";
 import { NextComponentType } from "next";
 import NextApp, { AppContext, AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import nookies from "nookies";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
 // import { cache } from "@/cache";
 import { AuthGuard, PageLayout, RouterTransition } from "@/components";
+import { ComponentPreviews, useInitial } from "@/components/dev";
 
 export type CustomAppProps = AppProps & {
   Component: NextComponentType & {
-    requireAuth?: boolean;
+    requireAuth?: boolean | Role[];
   };
   colorScheme?: ColorScheme;
 };
@@ -42,6 +45,25 @@ export default function App({
       maxAge: 60 * 60 * 24 * 30,
       sameSite: "strict",
     });
+  };
+
+  const component = useMemo(
+    () => (
+      <DevSupport
+        ComponentPreviews={ComponentPreviews}
+        useInitialHook={useInitial}
+      >
+        <Component {...pageProps} />
+      </DevSupport>
+    ),
+    [Component]
+  );
+
+  const getSecuredPage = () => {
+    if (Array.isArray(Component.requireAuth)) {
+      return <AuthGuard role={Component.requireAuth}>{component}</AuthGuard>;
+    }
+    return <AuthGuard>{component}</AuthGuard>;
   };
 
   return (
@@ -83,13 +105,7 @@ export default function App({
               })}
             />
             <PageLayout>
-              {Component.requireAuth ? (
-                <AuthGuard>
-                  <Component {...pageProps} />
-                </AuthGuard>
-              ) : (
-                <Component {...pageProps} />
-              )}
+              {Component.requireAuth ? getSecuredPage() : component}
             </PageLayout>
 
             <ReactQueryDevtools position="bottom-right" />

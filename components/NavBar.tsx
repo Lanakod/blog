@@ -12,6 +12,7 @@ import {
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
+import { Role } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
@@ -82,51 +83,43 @@ const MainLink: FC<MainLinkProps> = ({
   );
 };
 
-const data: MainLinkProps[] = [
+interface NavBarLink extends Omit<MainLinkProps, "setOpened"> {
+  role?: Role[];
+}
+
+const data: NavBarLink[] = [
   {
     pageLink: "/",
     label: "Главная",
     color: "blue",
     icon: <AiOutlineHome size={18} />,
-    setOpened: () => {
-      return null;
-    },
   },
   {
     pageLink: "/categories",
     label: "Посты",
     color: "teal",
     icon: <BiCategory size={18} />,
-    setOpened: () => {
-      return null;
-    },
+    role: ["WRITER"],
   },
   {
     pageLink: "/inventory",
     label: "Inventory",
     color: "violet",
     icon: <BsBox size={16} />,
-    setOpened: () => {
-      return null;
-    },
+    role: ["WRITER"],
   },
   {
     pageLink: "/products",
     label: "Products",
     color: "grape",
     icon: <TbClipboardList size={20} />,
-    setOpened: () => {
-      return null;
-    },
+    role: ["WRITER"],
   },
   {
     pageLink: "/settings",
     label: "Настройки",
     color: "orange",
     icon: <FiSettings size={16} />,
-    setOpened: () => {
-      return null;
-    },
   },
 ];
 
@@ -277,6 +270,7 @@ const User: FC = () => {
 };
 
 export const NavBar: FC<Props> = ({ setOpened, opened, hiddenBreakpoint }) => {
+  const { data: userData } = useSession();
   return (
     <Navbar
       p="xs"
@@ -288,9 +282,21 @@ export const NavBar: FC<Props> = ({ setOpened, opened, hiddenBreakpoint }) => {
         <Brand />
       </Navbar.Section>
       <Navbar.Section grow mt="md">
-        {data.map((item) => (
-          <MainLink {...item} key={item.label} setOpened={setOpened} />
-        ))}
+        {data.map((item) => {
+          const link = (
+            <MainLink {...item} key={item.label} setOpened={setOpened} />
+          );
+          if (userData) {
+            if (userData?.user?.role === "ADMIN") return link;
+            if (
+              userData?.user?.role &&
+              item.role?.includes(userData.user.role)
+            ) {
+              return link;
+            }
+            if (!item.role || item.role.includes("READER")) return link;
+          } else if (!item.role || item.role.includes("READER")) return link;
+        })}
       </Navbar.Section>
       <Navbar.Section>
         <User />

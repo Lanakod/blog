@@ -36,13 +36,22 @@ export const authOptions: NextAuthOptions = {
   useSecureCookies: process.env.NODE_ENV === "production",
   pages: {
     signIn: "/auth/signin",
+    error: "/500",
   },
   callbacks: {
     async redirect({ baseUrl }) {
       return baseUrl;
     },
     async session({ session, user }) {
-      if (session?.user) session.user.id = user.id;
+      const dbUser = await prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+      });
+      if (session?.user) {
+        session.user.id = user.id;
+        if (dbUser) session.user.role = dbUser.role;
+      }
       return session;
     },
   },

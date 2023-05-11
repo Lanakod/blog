@@ -37,7 +37,7 @@ Error.getInitialProps = async ({ res, err }: NextPageContext) => {
     await navigate("/", res);
   } else {
     if (statusCode >= 500) await navigate("/500", res);
-    if (statusCode >= 400 && statusCode <= 500) await navigate("/404", res);
+    // if (statusCode >= 400 && statusCode <= 500) await navigate("/404", res);
   }
   return {};
 };

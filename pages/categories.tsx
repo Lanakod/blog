@@ -250,4 +250,4 @@ const Categories: CustomNextPage = () => {
 };
 
 export default Categories;
-Categories.requireAuth = true;
+Categories.requireAuth = ["WRITER"];

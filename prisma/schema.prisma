@@ -50,6 +50,13 @@ model User {
   sessions      Session[]
   categories    Category[]
   products      Product[]
+  role          Role       @default(READER)
+}
+
+enum Role {
+  READER
+  WRITER
+  ADMIN
 }
 
 model VerificationToken {
