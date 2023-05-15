@@ -41,6 +41,10 @@ export const AuthGuard: React.FC<Props> = ({ children, role }) => {
     }
 
     if (status === "authenticated") {
+      if (data?.user?.role === "ADMIN") {
+        setUnauthorized(false);
+        return;
+      }
       if (!role || role.includes("READER")) {
         console.log("C");
         setUnauthorized(false);

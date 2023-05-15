@@ -95,7 +95,7 @@ const data: NavBarLink[] = [
     icon: <AiOutlineHome size={18} />,
   },
   {
-    pageLink: "/categories",
+    pageLink: "/posts",
     label: "Посты",
     color: "teal",
     icon: <BiCategory size={18} />,

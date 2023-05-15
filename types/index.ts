@@ -1,2 +1,2 @@
-export * from "./getCategories";
-export * from "./postCategories";
+export * from "./getPosts";
+export * from "./createPost";

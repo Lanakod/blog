@@ -15,53 +15,57 @@ import {
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { BiCategory } from "react-icons/bi";
 import { FiSearch } from "react-icons/fi";
 
 import { queryClient } from "@/pages/_app";
 import { useGetCategories, usePostCategory } from "@/queries";
-import { GetCategory, PostCategorySchema } from "@/types";
+import { CreatePostSchema, GetPosts } from "@/types";
 import { CustomNextPage } from "@/types/dts";
 
-const Categories: CustomNextPage = () => {
-  const { data: categories, isLoading: categoriesLoading } = useGetCategories();
+const PostsPage: CustomNextPage = () => {
+  const { data: posts, isLoading: postsLoading } = useGetCategories();
+  const router = useRouter();
   // ACCORDION VALUE/STATE
   const [accordionValue, setAccordionValue] = useState<string | null>(null);
 
   // SEARCH VALUE & DATA
-  const [selectData, setSelectData] = useState<GetCategory["name"][]>([]);
-  const [selectValue, setSelectValue] = useState<GetCategory["name"] | null>();
+  const [selectData, setSelectData] = useState<GetPosts["title"][]>([]);
+  const [selectValue, setSelectValue] = useState<GetPosts["title"] | null>();
   // FILTERED VALUES
-  const [filteredValues, setFilteredValues] = useState<GetCategory[]>();
+  const [filteredValues, setFilteredValues] = useState<GetPosts[]>();
   // MODAL STATE
   const [createModal, setCreateModal] = useState(false);
 
   // SET SELECT DATA FOR SEARCH
   useEffect(() => {
     setSelectData([]);
-    if (categories) {
-      categories.map((ctg) =>
-        setSelectData((selectData) => [...selectData, ctg.name])
+    if (posts) {
+      posts.map((ctg) =>
+        setSelectData((selectData) => [...selectData, ctg.title])
       );
     }
-    setFilteredValues(categories);
-  }, [categories]);
+    setFilteredValues(posts);
+  }, [posts]);
 
   // FILTER THE DATA BY THE SELECTED VALUE
   useEffect(() => {
     if (selectValue) {
-      setFilteredValues(categories?.filter((ctg) => ctg.name === selectValue));
+      setFilteredValues(posts?.filter((ctg) => ctg.title === selectValue));
     } else {
-      setFilteredValues(categories);
+      setFilteredValues(posts);
     }
-  }, [selectValue, categories]);
+  }, [selectValue, posts]);
 
   // VALIDATE POST CATEGORY FORM
-  const createCategoryForm = useForm({
-    validate: zodResolver(PostCategorySchema),
+  const createPostForm = useForm({
+    validate: zodResolver(CreatePostSchema),
     initialValues: {
-      name: "",
+      title: "",
+      content: "",
+      categoryId: "",
     },
   });
 
@@ -71,13 +75,13 @@ const Categories: CustomNextPage = () => {
   return (
     <>
       <Head>
-        <title>Categories</title>
+        <title>Index</title>
       </Head>
       <main>
         {/*  Title  */}
         <Group align="center" mb="3rem">
           <Title size="1.5rem" weight="500">
-            Your Categories
+            Your Posts
           </Title>
           <ThemeIcon variant="light" color="green" size="md">
             <BiCategory size="25" />
@@ -90,7 +94,7 @@ const Categories: CustomNextPage = () => {
           onChange={setSelectValue}
           clearable
           searchable
-          nothingFound="No Categories Found"
+          nothingFound="No Index Found"
           icon={<FiSearch />}
           transitionProps={{
             transition: "pop-top-left",
@@ -100,11 +104,11 @@ const Categories: CustomNextPage = () => {
           sx={{ maxWidth: "600px" }}
           mb="1.5rem"
         />
-        {/*  NO CATEGORIES  */}
-        {categories?.length === 0 && !categoriesLoading && (
+        {/*  NO posts  */}
+        {posts?.length === 0 && !postsLoading && (
           <Box>
             <Group align="center">
-              <Text size="lg">No Inventory/Categories</Text>
+              <Text size="lg">No Inventory/Index</Text>
               <FiSearch size="20" />
             </Group>
           </Box>
@@ -113,7 +117,7 @@ const Categories: CustomNextPage = () => {
         {/*  ACCORDION FOR THE DATA  */}
         <Skeleton
           mb="3rem"
-          visible={categoriesLoading ?? false}
+          visible={postsLoading ?? false}
           style={{ minHeight: "80px" }}
           animate
         >
@@ -124,11 +128,11 @@ const Categories: CustomNextPage = () => {
           >
             {filteredValues?.map((category, index) => (
               <Accordion.Item
-                value={category.name}
+                value={category.title}
                 sx={{ overflowX: "auto" }}
                 key={index}
               >
-                <Accordion.Control>{category.name}</Accordion.Control>
+                <Accordion.Control>{category.title}</Accordion.Control>
                 <Accordion.Panel
                   sx={{
                     width: "max-content",
@@ -145,42 +149,7 @@ const Categories: CustomNextPage = () => {
                         <th style={{ paddingLeft: 0 }}>Stock</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {category?.products?.map((product) => (
-                        <tr key={product.name}>
-                          {/*ID*/}
-                          <td>
-                            <div style={{ paddingLeft: "1rem" }}>
-                              {product.id}
-                            </div>
-                          </td>
-                          {/*NAME*/}
-                          <td>
-                            <div style={{ paddingLeft: "1rem" }}>
-                              {product.name}
-                            </div>
-                          </td>
-                          {/*PRICE*/}
-                          <td>
-                            <div style={{ paddingLeft: "1rem" }}>
-                              {product.price}
-                            </div>
-                          </td>
-                          {/*LAST UPDATED*/}
-                          <td>
-                            <div style={{ paddingLeft: "1rem" }}>
-                              {product.lastUpdate.toString()}
-                            </div>
-                          </td>
-                          {/*LATEST DATE - STOCK*/}
-                          <td>
-                            <div style={{ paddingLeft: "1rem" }}>
-                              {product?.date[0]?.stock || 0}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    <tbody></tbody>
                   </Table>
                   {/*  GROUP OF BUTTONS  */}
                   <Group>
@@ -196,14 +165,14 @@ const Categories: CustomNextPage = () => {
             ))}
           </Accordion>
         </Skeleton>
-        {/*  ACTIONS FOR CATEGORIES  */}
+        {/*  ACTIONS FOR posts  */}
         <Box>
           <Button
             color="blue"
             variant="outline"
-            onClick={() => setCreateModal(true)}
+            onClick={async () => await router.push("/posts/new")}
           >
-            Create Category
+            Новый пост
           </Button>
         </Box>
 
@@ -216,11 +185,11 @@ const Categories: CustomNextPage = () => {
           title="Create Category"
         >
           <form
-            onSubmit={createCategoryForm.onSubmit((values) => {
+            onSubmit={createPostForm.onSubmit((values) => {
               postCategory(values, {
                 onSuccess: async () => {
                   setCreateModal(false);
-                  await queryClient.refetchQueries(["categories"]);
+                  await queryClient.refetchQueries(["posts"]);
                 },
               });
             })}
@@ -234,7 +203,7 @@ const Categories: CustomNextPage = () => {
               label="Category name"
               withAsterisk
               mb="1rem"
-              {...createCategoryForm.getInputProps("name")}
+              {...createPostForm.getInputProps("title")}
             />
             <Group noWrap={false}>
               <Button type="submit">Create</Button>
@@ -249,5 +218,5 @@ const Categories: CustomNextPage = () => {
   );
 };
 
-export default Categories;
-Categories.requireAuth = ["WRITER"];
+export default PostsPage;
+PostsPage.requireAuth = ["WRITER"];

@@ -23,8 +23,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -40,25 +39,6 @@ model Session {
   @@index([userId])
 }
 
-model User {
-  id            String     @id @default(cuid())
-  name          String?
-  email         String?    @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  categories    Category[]
-  products      Product[]
-  role          Role       @default(READER)
-}
-
-enum Role {
-  READER
-  WRITER
-  ADMIN
-}
-
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -67,46 +47,61 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Category {
-  id   String @id @default(cuid())
-  name String @unique
+model User {
+  id            String              @id @default(cuid())
+  name          String?
+  email         String?             @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  role          Role                @default(READER)
+  likes         UserPostLikes[]
+  bookmarks     UserPostBookmarks[]
+}
 
-  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+enum Role {
+  READER
+  WRITER
+  ADMIN
+}
+
+model UserPostLikes {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
 
-  products Product[]
-
-  @@index([userId])
+  @@id([userId, postId])
 }
 
-model Date {
-  id    String   @id @default(cuid())
-  date  DateTime @default(now())
-  stock Int      @default(0)
+model UserPostBookmarks {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
 
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
-
-  @@index([productId])
+  @@id([userId, postId])
 }
 
-model Product {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-
-  price Float @default(0)
-
-  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+model Post {
+  id         String              @id @default(cuid())
+  title      String
+  content    String
+  image      String?
+  author     User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId   String
+  category   Category            @relation(fields: [categoryId], references: [id], onDelete: NoAction)
   categoryId String
+  likes      UserPostLikes[]
+  bookmarks  UserPostBookmarks[]
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @default(now())
+}
 
-  date Date[]
-
-  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-  lastUpdate DateTime @default(now())
-  createdAt  DateTime @default(now())
-
-  @@index([userId, categoryId])
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[]
 }

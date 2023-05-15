@@ -1,17 +1,17 @@
-import { useQuery, useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
+
 import { axios } from "@/config";
-import { type GetCategory, PostCategory } from "@/types";
+import { CreatePost, type GetPosts } from "@/types";
 
-const getCategories = async (): Promise<GetCategory[]> => {
-  const { data } = await axios.get("/category");
+const getCategories = async (): Promise<GetPosts[]> => {
+  const { data } = await axios.get("/posts");
   return data;
 };
 
-const postCategory = async (props: PostCategory) => {
-  const { data } = await axios.post("/category", props);
+const postCategory = async (props: CreatePost) => {
+  const { data } = await axios.post("/posts", props);
   return data;
 };
 
-export const useGetCategories = () => useQuery(["categories"], getCategories);
-export const usePostCategory = () =>
-  useMutation(["postCategory"], postCategory);
+export const useGetCategories = () => useQuery(["posts"], getCategories);
+export const usePostCategory = () => useMutation(["posts"], postCategory);

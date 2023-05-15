@@ -1,21 +1,9 @@
-import {
-  ActionIcon,
-  Avatar,
-  Badge,
-  Card,
-  Container,
-  Group,
-  Image,
-  SimpleGrid,
-  Text,
-  rem,
-  useMantineTheme,
-} from "@mantine/core";
+import { Container, SimpleGrid, useMantineTheme } from "@mantine/core";
 import Head from "next/head";
 import { useMemo } from "react";
-import { AiFillHeart } from "react-icons/ai";
-import { BsBookmarkFill, BsShareFill } from "react-icons/bs";
 
+import { PostCard } from "@/components/PostCard";
+import { useGetCategories } from "@/queries";
 import { CustomNextPage } from "@/types/dts";
 
 const mockdata = [
@@ -24,7 +12,6 @@ const mockdata = [
     footer: "733 people liked this",
     author: {
       name: "Elsa Gardenowl",
-      description: "posted 34 minutes ago",
       image:
         "https://images.unsplash.com/photo-1628890923662-2cb23c2e0cfe?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80",
     },
@@ -38,7 +25,6 @@ const mockdata = [
     footer: "733 people liked this",
     author: {
       name: "Elsa Gardenowl",
-      description: "posted 34 minutes ago",
       image:
         "https://images.unsplash.com/photo-1628890923662-2cb23c2e0cfe?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80",
     },
@@ -52,7 +38,6 @@ const mockdata = [
     footer: "733 people liked this",
     author: {
       name: "Elsa Gardenowl",
-      description: "posted 34 minutes ago",
       image:
         "https://images.unsplash.com/photo-1628890923662-2cb23c2e0cfe?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80",
     },
@@ -66,7 +51,6 @@ const mockdata = [
     footer: "733 people liked this",
     author: {
       name: "Elsa Gardenowl",
-      description: "posted 34 minutes ago",
       image:
         "https://images.unsplash.com/photo-1628890923662-2cb23c2e0cfe?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80",
     },
@@ -79,82 +63,13 @@ const mockdata = [
 
 const Home: CustomNextPage = () => {
   const theme = useMantineTheme();
+  const { data: posts, isLoading: postsLoading } = useGetCategories();
   const cards = useMemo(
     () =>
-      mockdata.map((article) => (
-        <Card
-          key={article.title}
-          withBorder
-          padding="lg"
-          radius="md"
-          sx={(theme) => ({
-            backgroundColor:
-              theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-          })}
-        >
-          <Card.Section mb="sm">
-            <Image src={article.image} alt={article.title} height={180} />
-          </Card.Section>
-
-          <Badge>{article.category}</Badge>
-
-          <Text fw={700} mt="xs">
-            {article.title}
-          </Text>
-          <Text
-            color="dimmed"
-            size="xs"
-            transform="uppercase"
-            weight={700}
-            mt="md"
-          >
-            {article.date}
-          </Text>
-
-          <Group mt="lg">
-            <Avatar src={article.author.image} radius="sm" />
-            <div>
-              <Text fw={500}>{article.author.name}</Text>
-              <Text fz="xs" c="dimmed">
-                {article.author.description}
-              </Text>
-            </div>
-          </Group>
-
-          <Card.Section
-            sx={(theme) => ({
-              padding: `${theme.spacing.xs} ${theme.spacing.lg}`,
-              marginTop: theme.spacing.md,
-              borderTop: `${rem(1)} solid ${
-                theme.colorScheme === "dark"
-                  ? theme.colors.dark[5]
-                  : theme.colors.gray[2]
-              }`,
-            })}
-          >
-            <Group position="apart">
-              <Text fz="xs" c="dimmed">
-                {article.footer}
-              </Text>
-              <Group spacing={0}>
-                <ActionIcon>
-                  <AiFillHeart size="1.2rem" color={theme.colors.red[6]} />
-                </ActionIcon>
-                <ActionIcon>
-                  <BsBookmarkFill
-                    size="1.2rem"
-                    color={theme.colors.yellow[6]}
-                  />
-                </ActionIcon>
-                <ActionIcon>
-                  <BsShareFill size="1.2rem" color={theme.colors.blue[6]} />
-                </ActionIcon>
-              </Group>
-            </Group>
-          </Card.Section>
-        </Card>
+      posts?.map((article) => (
+        <PostCard theme={theme} post={article} key={article.title} />
       )),
-    [mockdata]
+    [posts, theme]
   );
   return (
     <>
@@ -164,8 +79,29 @@ const Home: CustomNextPage = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container py="xl">
-        <SimpleGrid cols={2} breakpoints={[{ maxWidth: "sm", cols: 1 }]}>
+      <Container
+        py="xl"
+        sx={{
+          width: "100%",
+          maxWidth: "100%",
+          marginLeft: 0,
+          marginRight: 0,
+        }}
+      >
+        <SimpleGrid
+          sx={{
+            width: "100%",
+          }}
+          cols={3}
+          spacing="md"
+          breakpoints={[
+            { maxWidth: "md", cols: 1 },
+            {
+              maxWidth: "lg",
+              cols: 2,
+            },
+          ]}
+        >
           {cards}
         </SimpleGrid>
       </Container>
