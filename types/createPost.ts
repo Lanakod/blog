@@ -7,6 +7,7 @@ export const CreatePostSchema = z.object({
     .string()
     .min(50, { message: "Минимальная длина текста 50 символов" }),
   categoryId: z.string().nonempty(),
+  slug: z.string(),
 });
 
 export type CreatePost = z.infer<typeof CreatePostSchema>;

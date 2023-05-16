@@ -16,7 +16,6 @@ import { useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
-// import { cache } from "@/cache";
 import { AuthGuard, PageLayout, RouterTransition } from "@/components";
 import { ComponentPreviews, useInitial } from "@/components/dev";
 

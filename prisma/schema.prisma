@@ -87,6 +87,7 @@ model UserPostBookmarks {
 
 model Post {
   id         String              @id @default(cuid())
+  slug       String
   title      String
   content    String
   image      String?
@@ -98,10 +99,13 @@ model Post {
   bookmarks  UserPostBookmarks[]
   createdAt  DateTime            @default(now())
   updatedAt  DateTime            @default(now())
+
+  @@unique([slug])
 }
 
 model Category {
   id    String @id @default(cuid())
   name  String @unique
+  color String @default("#339af0")
   posts Post[]
 }

@@ -5,12 +5,16 @@ import { prisma } from "@/config/prisma";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { CreatePostSchema } from "@/types";
 
-const postCategory = async (req: NextApiRequest, res: NextApiResponse) => {
+const postsApi = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions);
-  if (!session || !session.user)
-    res.status(401).json({ message: "Unauthorized" });
-  else if (req.method === "POST") {
-    const { title, content, categoryId } = req.body;
+
+  if (req.method === "POST") {
+    if (!session || !session.user) {
+      res.status(401).json({ message: "Unauthorized" });
+      res.end();
+      return;
+    }
+    const { title, content, categoryId, slug } = req.body;
     const response = CreatePostSchema.safeParse(req.body);
     if (!response.success) {
       res.status(400).json({ message: response.error.issues });
@@ -21,15 +25,15 @@ const postCategory = async (req: NextApiRequest, res: NextApiResponse) => {
           title,
           content,
           categoryId,
+          slug,
           authorId: session.user.id,
         },
       });
       res.status(201).json(post);
     } catch (e) {
-      res.status(500).json({ message: "Post Create Error" });
+      res.status(500).json({ message: "Post Create Error", error: e });
     }
-  }
-  if (req.method === "GET") {
+  } else if (req.method === "GET") {
     try {
       const posts = await prisma.post.findMany({
         select: {
@@ -38,6 +42,7 @@ const postCategory = async (req: NextApiRequest, res: NextApiResponse) => {
           content: true,
           title: true,
           id: true,
+          slug: true,
           author: {
             select: {
               name: true,
@@ -48,10 +53,10 @@ const postCategory = async (req: NextApiRequest, res: NextApiResponse) => {
       });
       res.status(200).json(posts);
     } catch (e) {
-      res.status(500).json({ message: "Index Get Error", error: e });
+      res.status(500).json({ message: "Posts Get Error", error: e });
     }
   }
   res.end();
 };
 
-export default postCategory;
+export default postsApi;

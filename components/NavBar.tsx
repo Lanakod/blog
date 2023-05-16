@@ -102,8 +102,8 @@ const data: NavBarLink[] = [
     role: ["WRITER"],
   },
   {
-    pageLink: "/inventory",
-    label: "Inventory",
+    pageLink: "/categories",
+    label: "Категории",
     color: "violet",
     icon: <BsBox size={16} />,
     role: ["WRITER"],

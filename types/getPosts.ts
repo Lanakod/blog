@@ -13,8 +13,10 @@ export interface GetPosts {
   title: Post["title"];
   content: Post["content"];
   image: Post["image"];
+  slug: Post["slug"];
   category: {
     name: Category["name"];
+    color: Category["color"];
   };
   author: {
     name: User["name"];

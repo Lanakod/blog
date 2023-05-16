@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Button,
   Group,
   Input,
@@ -21,18 +22,19 @@ import React from "react";
 import { BiCategory } from "react-icons/bi";
 
 import { queryClient } from "@/pages/_app";
-import { usePostCategory } from "@/queries";
+import { useCreatePost, useGetCategories } from "@/queries";
 import { CreatePostSchema } from "@/types";
 import { CustomNextPage } from "@/types/dts";
 
 const NewPostPage: CustomNextPage = () => {
+  const { data: categories, isLoading } = useGetCategories();
   const createPostForm = useForm({
     validate: zodResolver(CreatePostSchema),
     initialValues: {
       title: "",
       content: "",
-      // FIXME: Remove this CONST
-      categoryId: "clhj8kgc10000ma8zj204a7qj",
+      slug: "",
+      categoryId: "",
     },
   });
   const editor = useEditor({
@@ -50,8 +52,7 @@ const NewPostPage: CustomNextPage = () => {
     },
     content: createPostForm.getInputProps("content").value,
   });
-  const { mutate: postCategory, isLoading: postCategoryLoading } =
-    usePostCategory();
+  const { mutate: createPost, isLoading: createPostLoading } = useCreatePost();
 
   return (
     <>
@@ -68,16 +69,31 @@ const NewPostPage: CustomNextPage = () => {
           </ThemeIcon>
         </Group>
         <form
-          onSubmit={createPostForm.onSubmit((values) => {
-            postCategory(values, {
-              onSuccess: async () => {
-                await queryClient.refetchQueries(["posts"]);
-              },
-            });
-          })}
+          onSubmit={createPostForm.onSubmit(
+            (values) => {
+              const ctg = categories?.find((c) => {
+                return c.name === values.categoryId;
+              });
+              console.log(ctg);
+              if (categories && ctg) {
+                values.categoryId = ctg.id;
+                createPost(values, {
+                  onSuccess: async () => {
+                    await queryClient.refetchQueries(["posts"]);
+                  },
+                  onError: async (e) => {
+                    console.log(e);
+                  },
+                });
+              }
+            },
+            (errors, values) => {
+              console.log(errors, values);
+            }
+          )}
         >
           <LoadingOverlay
-            visible={postCategoryLoading ?? false}
+            visible={createPostLoading ?? false}
             transitionDuration={500}
           />
           <TextInput
@@ -86,6 +102,25 @@ const NewPostPage: CustomNextPage = () => {
             withAsterisk
             mb="1rem"
             {...createPostForm.getInputProps("title")}
+          />
+          <Autocomplete
+            placeholder="Категория"
+            label="Категория"
+            withAsterisk
+            mb="1rem"
+            nothingFound="Категория не найдена"
+            transitionProps={{
+              transition: "pop-top-left",
+              duration: 80,
+              timingFunction: "ease",
+            }}
+            data={
+              categories?.map((c) => ({
+                value: c.name,
+                id: c.id,
+              })) || []
+            }
+            {...createPostForm.getInputProps("categoryId")}
           />
 
           <Input.Wrapper {...createPostForm.getInputProps("content")}>

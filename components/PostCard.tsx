@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Avatar,
   Badge,
+  Button,
   Card,
   Group,
   Image,
@@ -10,6 +11,7 @@ import {
   rem,
 } from "@mantine/core";
 import moment from "moment";
+import { useRouter } from "next/router";
 import React, { FC } from "react";
 import { AiFillHeart } from "react-icons/ai";
 import { BsBookmarkFill, BsShareFill } from "react-icons/bs";
@@ -21,6 +23,7 @@ type Props = {
   theme: MantineTheme;
 };
 export const PostCard: FC<Props> = ({ post, theme }) => {
+  const router = useRouter();
   return (
     <Card
       withBorder
@@ -41,7 +44,14 @@ export const PostCard: FC<Props> = ({ post, theme }) => {
         <Image src={post.image} alt={post.title} height={180} />
       </Card.Section>
 
-      <Badge>{post.category.name}</Badge>
+      <Badge
+        sx={{
+          background: `${post.category.color}20`,
+          color: post.category.color,
+        }}
+      >
+        {post.category.name}
+      </Badge>
 
       <Text fw={700} mt="xs">
         {post.title}
@@ -69,10 +79,6 @@ export const PostCard: FC<Props> = ({ post, theme }) => {
         })}
       >
         <Group position="apart">
-          <Text fz="xs" c="dimmed">
-            {/*{post.footer}*/}
-            Fooooooter
-          </Text>
           <Group spacing={0}>
             <ActionIcon>
               <AiFillHeart size="1.2rem" color={theme.colors.red[6]} />
@@ -84,6 +90,12 @@ export const PostCard: FC<Props> = ({ post, theme }) => {
               <BsShareFill size="1.2rem" color={theme.colors.blue[6]} />
             </ActionIcon>
           </Group>
+          <Button
+            variant="light"
+            onClick={async () => await router.push(`/post/${post.slug}`)}
+          >
+            Читать
+          </Button>
         </Group>
       </Card.Section>
     </Card>
