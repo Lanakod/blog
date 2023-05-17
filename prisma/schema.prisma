@@ -59,6 +59,18 @@ model User {
   role          Role                @default(READER)
   likes         UserPostLikes[]
   bookmarks     UserPostBookmarks[]
+  comments      Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 enum Role {
@@ -97,6 +109,7 @@ model Post {
   categoryId String
   likes      UserPostLikes[]
   bookmarks  UserPostBookmarks[]
+  comments   Comment[]
   createdAt  DateTime            @default(now())
   updatedAt  DateTime            @default(now())
 

@@ -62,7 +62,7 @@ export const PostCard: FC<Props> = ({ post, theme }) => {
         <div>
           <Text fw={500}>{post.author.name}</Text>
           <Text fz="xs" c="dimmed">
-            {moment(post.createdAt).locale("ru").format("LL")}
+            {moment(post.createdAt).locale("ru").format("LLL")}
           </Text>
         </div>
       </Group>

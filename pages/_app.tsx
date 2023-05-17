@@ -19,6 +19,8 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { AuthGuard, PageLayout, RouterTransition } from "@/components";
 import { ComponentPreviews, useInitial } from "@/components/dev";
 
+import "moment/locale/ru";
+
 export type CustomAppProps = AppProps & {
   Component: NextComponentType & {
     requireAuth?: boolean | Role[];

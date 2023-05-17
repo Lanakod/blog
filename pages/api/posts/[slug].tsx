@@ -11,6 +11,25 @@ const postsApi = async (req: NextApiRequest, res: NextApiResponse) => {
         where: {
           slug: slug as string,
         },
+        select: {
+          image: true,
+          category: true,
+          content: true,
+          title: true,
+          id: true,
+          slug: true,
+          author: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+          comments: true,
+          bookmarks: true,
+          likes: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       });
       res.status(200).json(post);
     } catch (e) {

@@ -49,6 +49,11 @@ const postsApi = async (req: NextApiRequest, res: NextApiResponse) => {
               image: true,
             },
           },
+          comments: true,
+          bookmarks: true,
+          likes: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
       res.status(200).json(posts);

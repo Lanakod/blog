@@ -1,4 +1,5 @@
 import { Container, SimpleGrid, useMantineTheme } from "@mantine/core";
+import moment from "moment";
 import Head from "next/head";
 import { useMemo } from "react";
 
@@ -11,9 +12,13 @@ const Home: CustomNextPage = () => {
   const { data: posts, isLoading: postsLoading } = useGetPosts();
   const cards = useMemo(
     () =>
-      posts?.map((article) => (
-        <PostCard theme={theme} post={article} key={article.title} />
-      )),
+      posts
+        ?.sort(
+          (a, b) => moment(b.updatedAt).unix() - moment(a.updatedAt).unix()
+        )
+        ?.map((article) => (
+          <PostCard theme={theme} post={article} key={article.title} />
+        )),
     [posts, theme]
   );
   return (

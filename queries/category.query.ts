@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "react-query";
 
 import { axios } from "@/config";
-import { CreateCategory, GetCategories } from "@/types";
+import { CreateCategory, GetCategory } from "@/types";
 
-const getCategories = async (): Promise<GetCategories[]> => {
+const getCategories = async (): Promise<GetCategory[]> => {
   const { data } = await axios.get("/categories");
   return data;
 };
