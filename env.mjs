@@ -15,6 +15,7 @@ export const env = createEnv({
     GITLAB_CLIENT_SECRET: z.string().min(1),
     DISCORD_CLIENT_ID: z.string().min(1),
     DISCORD_CLIENT_SECRET: z.string().min(1),
+    FILES_SAVE_DIR: z.string().min(2)
   },
   client: {},
   runtimeEnv: {
@@ -30,5 +31,6 @@ export const env = createEnv({
     GITLAB_CLIENT_SECRET: process.env.GITLAB_CLIENT_SECRET,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+    FILES_SAVE_DIR: process.env.FILES_SAVE_DIR
   },
 });

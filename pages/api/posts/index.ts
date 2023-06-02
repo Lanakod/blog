@@ -1,7 +1,11 @@
+import * as fs from "fs";
+import path from "path";
+
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 
 import { prisma } from "@/config/prisma";
+import { env } from "@/env.mjs";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { CreatePostSchema } from "@/types";
 
@@ -14,18 +18,28 @@ const postsApi = async (req: NextApiRequest, res: NextApiResponse) => {
       res.end();
       return;
     }
-    const { title, content, categoryId, slug } = req.body;
+    const { title, content, categoryId, slug, image } = req.body;
     const response = CreatePostSchema.safeParse(req.body);
     if (!response.success) {
       res.status(400).json({ message: response.error.issues });
     }
     try {
+      if (!fs.existsSync(path.resolve(env.FILES_SAVE_DIR))) {
+        fs.mkdirSync(path.resolve(env.FILES_SAVE_DIR));
+      }
+      let imageWritten = "";
+      if (image) {
+        const imagePath = path.resolve(env.FILES_SAVE_DIR, slug);
+        fs.writeFileSync(imagePath, image, {});
+        if (fs.existsSync(imagePath)) imageWritten = imagePath;
+      }
       const post = await prisma.post.create({
         data: {
           title,
           content,
           categoryId,
           slug,
+          image: imageWritten ? imageWritten : null,
           authorId: session.user.id,
         },
       });
@@ -56,7 +70,20 @@ const postsApi = async (req: NextApiRequest, res: NextApiResponse) => {
           updatedAt: true,
         },
       });
-      res.status(200).json(posts);
+      const responsePosts = posts.map((post) => {
+        if (post.image) {
+          if (!fs.existsSync(path.resolve(env.FILES_SAVE_DIR, post.slug)))
+            return post;
+          const image = fs.readFileSync(
+            path.resolve(env.FILES_SAVE_DIR, post.slug),
+            {
+              encoding: "utf8",
+            }
+          );
+          return { ...post, image };
+        } else return post;
+      });
+      res.status(200).json(responsePosts);
     } catch (e) {
       res.status(500).json({ message: "Posts Get Error", error: e });
     }

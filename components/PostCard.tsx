@@ -17,6 +17,7 @@ import { AiFillHeart } from "react-icons/ai";
 import { BsBookmarkFill, BsShareFill } from "react-icons/bs";
 
 import { GetPosts } from "@/types";
+import { hexToBlob } from "@/utils";
 
 type Props = {
   post: GetPosts;
@@ -41,7 +42,11 @@ export const PostCard: FC<Props> = ({ post, theme }) => {
       })}
     >
       <Card.Section mb="sm">
-        <Image src={post.image} alt={post.title} height={180} />
+        <Image
+          src={post.image ? URL.createObjectURL(hexToBlob(post.image)) : null}
+          alt={post.title}
+          height={180}
+        />
       </Card.Section>
 
       <Badge

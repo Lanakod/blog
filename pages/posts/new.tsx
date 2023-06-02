@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   Button,
+  FileInput,
   Group,
   Input,
   LoadingOverlay,
@@ -18,16 +19,20 @@ import { Underline } from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import Head from "next/head";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 import { BiCategory } from "react-icons/bi";
+import { BsUpload } from "react-icons/bs";
 
-import { queryClient } from "@/pages/_app";
 import { useCreatePost, useGetCategories } from "@/queries";
 import { CreatePostSchema } from "@/types";
 import { CustomNextPage } from "@/types/dts";
+import { fileToHex, generateSlug } from "@/utils";
 
 const NewPostPage: CustomNextPage = () => {
+  const router = useRouter();
   const { data: categories, isLoading } = useGetCategories();
+  const [image, setImage] = useState<File | null>(null);
   const createPostForm = useForm({
     validate: zodResolver(CreatePostSchema),
     initialValues: {
@@ -35,6 +40,7 @@ const NewPostPage: CustomNextPage = () => {
       content: "",
       slug: "",
       categoryId: "",
+      image: "",
     },
   });
   const editor = useEditor({
@@ -70,16 +76,19 @@ const NewPostPage: CustomNextPage = () => {
         </Group>
         <form
           onSubmit={createPostForm.onSubmit(
-            (values) => {
+            async (values) => {
               const ctg = categories?.find((c) => {
                 return c.name === values.categoryId;
               });
               console.log(ctg);
               if (categories && ctg) {
                 values.categoryId = ctg.id;
+                if (image) {
+                  values.image = await fileToHex(image);
+                }
                 createPost(values, {
                   onSuccess: async () => {
-                    await queryClient.refetchQueries(["posts"]);
+                    await router.push(`/post/${generateSlug(values.title)}`);
                   },
                   onError: async (e) => {
                     console.log(e);
@@ -103,6 +112,24 @@ const NewPostPage: CustomNextPage = () => {
             mb="1rem"
             {...createPostForm.getInputProps("title")}
           />
+          <Input.Wrapper {...createPostForm.getInputProps("image")} mb="1rem">
+            <FileInput
+              accept="image/png,image/jpeg"
+              placeholder="Изображение"
+              label="Изображение"
+              // value={image}
+              value={image}
+              onChange={async (file) => {
+                if (file) {
+                  setImage(file);
+                  createPostForm.setValues({ image: await fileToHex(file) });
+                }
+              }}
+              icon={<BsUpload />}
+              withAsterisk
+            />
+          </Input.Wrapper>
+
           <Autocomplete
             placeholder="Категория"
             label="Категория"
